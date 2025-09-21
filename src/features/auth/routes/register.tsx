@@ -5,6 +5,16 @@ import {Input} from "@/components/ui/input.tsx";
 import {useMutation} from "@tanstack/react-query";
 import {register} from "@/features/auth/api/register.ts";
 import {useState} from "react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {toast} from "sonner";
 
 export default function Register() {
 
@@ -15,19 +25,24 @@ export default function Register() {
   const [state, setState] = useState("");
   const [street, setStreet] = useState("");
   const [city, setCity] = useState("");
+  const [accountType, setAccountType] = useState("farmer");
 
   const mutation = useMutation({
     mutationFn: register,
-    onSuccess: (data) => {
-      console.log("Login bem-sucedido:", data);
+    onSuccess: () => {
+      toast.success("Conta criada com sucesso", {
+        className: "bg-card text-card-foreground border-border"
+      })
     },
     onError: (error) => {
-      console.error("Erro no login:", error);
+      toast.error("" + error.message, {
+        className: "bg-card text-card-foreground border-border"
+      })
     },
   });
 
   return (
-    <Card className="w-full max-w-sm m-auto mt-10">
+    <Card className="w-full max-w-sm m-auto mt-10 mb-10">
       <CardHeader>
         <CardTitle className="m-auto">Crie sua conta para começar a usar</CardTitle>
       </CardHeader>
@@ -35,14 +50,14 @@ export default function Register() {
         onSubmit={(e) => {
           e.preventDefault();
           mutation.mutate({
-            email, name, password, city, phone, street
+            email, name, password, city, phone, street, accountType
           });
         }}>
         <CardContent>
 
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
-              <Label htmlFor="nome">Nome {import.meta.env.VITE_API_URL}</Label>
+              <Label htmlFor="nome">Nome</Label>
               <Input
                 id="nome"
                 type="nome"
@@ -127,6 +142,18 @@ export default function Register() {
               </div>
               <Input id="ConfirmPassword" type="password" required/>
             </div>
+            <Select value={accountType} onValueChange={setAccountType}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Tipo de conta"/>
+              </SelectTrigger>
+              <SelectContent side="bottom">
+                <SelectGroup>
+                  <SelectLabel>Contas</SelectLabel>
+                  <SelectItem value="farmer">Farmer</SelectItem>
+                  <SelectItem value="user">User</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
 
         </CardContent>
@@ -141,5 +168,6 @@ export default function Register() {
         </CardFooter>
       </form>
     </Card>
+
   );
 }
