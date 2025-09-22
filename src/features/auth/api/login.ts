@@ -7,14 +7,18 @@ type LoginPayload = {
   password: string;
 };
 
+interface LoginResponse {
+  email: string;
+  token: string;
+}
 
-export async function login(payload: LoginPayload): Promise<void> {
+export async function login(payload: LoginPayload): Promise<LoginResponse> {
   if (!apiUrl) {
     throw new Error("Missing API key!");
   }
-  const apiRegister = `${apiUrl}/auth`
+  const apiLogin = `${apiUrl}/auth`
   const {data} = await axios.post(
-    apiRegister,
+    apiLogin,
     payload
   );
   return data;

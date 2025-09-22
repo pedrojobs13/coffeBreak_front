@@ -10,22 +10,25 @@ import {
 import {Button} from "@/components/ui/button.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Label} from "@/components/ui/label.tsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useMutation} from "@tanstack/react-query";
 import {toast} from "sonner";
+import {Link, useNavigate} from "@tanstack/react-router";
+import {useAuth} from "@/features/auth/hooks/useAuth.ts";
 import {login} from "@/features/auth/api/login.ts";
-import {Link} from "@tanstack/react-router";
 
 export default function Login() {
-
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const {loginUser, isAuthenticated} = useAuth();
   const mutation = useMutation({
     mutationFn: login,
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Login feito com sucesso", {
         className: "bg-card text-card-foreground border-border"
       })
+      loginUser(data.token)
     },
     onError: (error) => {
       toast.error("" + error.message, {
@@ -33,6 +36,12 @@ export default function Login() {
       })
     },
   });
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log("REDIRECIONANDO PARA O DASHBOARD...");
+      navigate({to: "/dashboard"});
+    }
+  }, [isAuthenticated, navigate])
   return (
     <Card className="w-full max-w-sm m-auto mt-10">
       <CardHeader>
